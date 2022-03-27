@@ -1,4 +1,3 @@
-from functools import cache
 from os import write
 from matplotlib import pyplot
 from scipy.sparse import data
