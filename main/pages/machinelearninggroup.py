@@ -22,7 +22,7 @@ def machinelearningdisplaygroup():
     # dataframe as false before if conditions
     df_file = False
 
-    st.subheader("Machine Learning of Dataset - Group Entry Prediction")
+    st.subheader("1. Model Training")
 
     st.sidebar.subheader('Upload your CSV data')
     uploaded_file = st.sidebar.file_uploader(
@@ -37,19 +37,20 @@ def machinelearningdisplaygroup():
         #st.button("Use already cleaned dataset???")
 
     if df_file == True:
-        st.write('**1.1. Cleaned Dataset Dataframe**')
+        st.write('**Step 1.1:  Uploaded Cleaned Dataset Dataframe**')
         st.write(df)
         headers = list(df.columns)
 
         # https://github.com/thefullstackninja/Streamlit_tutorials/blob/master/data_visualization_app.py #
 
+        st.write('**Step 1.2:  Feature Selection**')
+
         try:
             # seaborn visualisation using correlation plot to identify relationships
-            heatmap = st.checkbox("Activate Correlation Plot")
+            heatmap = st.checkbox("Activate Correlation Matrix")
             if heatmap:
-                st.write('**Correlation Plot**')
                 st.write(
-                    "Correlation Plot provides graphical visualisation to offer insight into where relationships within the data exists")
+                    "**Correlation Matrix** is a table displaying the correlation coefficients between variables. Each cell demonstrates the correlation between two variables")
 
                 df_corr = df.corr()
                 sns.heatmap(df_corr, annot=True, cmap='YlGnBu')
@@ -60,82 +61,81 @@ def machinelearningdisplaygroup():
                 cor_target = abs(df_corr["Trans_Programming_Score"])
                 #Selecting highly correlated features
                 relevant_features = cor_target[cor_target>0.1]
-                st.write('**Correlation Ranking >0.1**')
+                st.write('Correlation Ranking > 0.1 : ')
                 st.write(relevant_features)
 
         except ValueError:
-            st.write('Dataset is not appropriate for Correlation Plot')
+            st.write('Dataset is not appropriate for Correlation Matrix')
 
-        global numeric_columns
-        global non_numeric_columns
-        try:
+        #global numeric_columns
+        #global non_numeric_columns
+        #try:
             # seaborn visualisation using graph plot
-            graph = st.checkbox("Activate Data Plot")
-            if graph:
-                st.write('**Data Plot**')
-                chart_select = st.sidebar.selectbox(
-                    label="Select the chart type",
-                    options=['Scatterplots', 'Histogram', 'Boxplot'])
+            #graph = st.checkbox("Activate Data Plot")
+            #if graph:
+                #st.write('**Data Plot**')
+                #chart_select = st.sidebar.selectbox(
+                    #label="Select the chart type",
+                    #options=['Scatterplots', 'Histogram', 'Boxplot'])
 
-                numeric_columns = list(
-                    df.select_dtypes(['float', 'int']).columns)
-                non_numeric_columns = list(
-                    df.select_dtypes(['object']).columns)
-                non_numeric_columns.append(None)
-                print(non_numeric_columns)
+                #numeric_columns = list(
+                    #df.select_dtypes(['float', 'int']).columns)
+                #non_numeric_columns = list(
+                    #df.select_dtypes(['object']).columns)
+                #non_numeric_columns.append(None)
+                #print(non_numeric_columns)
 
-                if chart_select == 'Scatterplots':
-                    st.sidebar.subheader("Scatterplot Settings")
-                    try:
-                        x_values = st.sidebar.selectbox(
-                            'X axis', options=numeric_columns)
-                        y_values = st.sidebar.selectbox(
-                            'Y axis', options=numeric_columns)
+                #if chart_select == 'Scatterplots':
+                    #st.sidebar.subheader("Scatterplot Settings")
+                    #try:
+                        #x_values = st.sidebar.selectbox(
+                            #'X axis', options=numeric_columns)
+                        #y_values = st.sidebar.selectbox(
+                            #'Y axis', options=numeric_columns)
                         #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        plot = px.scatter(
-                            data_frame=df, x=x_values, y=y_values)
+                        #plot = px.scatter(
+                            #data_frame=df, x=x_values, y=y_values)
 
                         # display the chart
-                        st.plotly_chart(plot)
+                        #st.plotly_chart(plot)
 
-                    except Exception as e:
-                        print(e)
+                    #except Exception as e:
+                        #print(e)
 
-                elif chart_select == 'Histogram':
-                    st.sidebar.subheader("Histogram Settings")
-                    try:
-                        x_values = st.sidebar.selectbox(
-                            'X axis', options=numeric_columns)
-                        y_values = st.sidebar.selectbox(
-                            'Y axis', options=numeric_columns)
+                #elif chart_select == 'Histogram':
+                    #st.sidebar.subheader("Histogram Settings")
+                    #try:
+                        #x_values = st.sidebar.selectbox(
+                            #'X axis', options=numeric_columns)
+                        #y_values = st.sidebar.selectbox(
+                            #'Y axis', options=numeric_columns)
                         #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        plot = px.histogram(data_frame=df, x=x_values, y=y_values)
-                        st.plotly_chart(plot)
-                    except Exception as e:
-                        print(e)
+                        #plot = px.histogram(data_frame=df, x=x_values, y=y_values)
+                        #st.plotly_chart(plot)
+                    #except Exception as e:
+                        #print(e)
 
-                elif chart_select == 'Boxplot':
-                    st.sidebar.subheader("Boxplot Settings")
-                try:
-                    y = st.sidebar.selectbox("Y axis", options=numeric_columns)
-                    x = st.sidebar.selectbox(
-                        "X axis", options=non_numeric_columns)
+                #elif chart_select == 'Boxplot':
+                    #st.sidebar.subheader("Boxplot Settings")
+                #try:
+                    #y = st.sidebar.selectbox("Y axis", options=numeric_columns)
+                    #x = st.sidebar.selectbox(
+                        #"X axis", options=non_numeric_columns)
                     #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                    plot = px.box(data_frame=df, y=y, x=x)
-                    st.plotly_chart(plot)
-                except Exception as e:
-                    print(e)
+                    #plot = px.box(data_frame=df, y=y, x=x)
+                    #st.plotly_chart(plot)
+                #except Exception as e:
+                    #print(e)
 
-        except ValueError:
-            st.write('Dataset is not appropriate for Graph Plot')
+        #except ValueError:
+            #st.write('Dataset is not appropriate for Graph Plot')
 
         try:
             # seaborn visualisation using pair plots to identify relationships
-            pair_plot = st.checkbox("Activate Pair Plot")
+            pair_plot = st.checkbox("Activate Pairs Plot")
             if pair_plot:
-                st.write('**Pair Plots**')
                 st.write(
-                    "Pair Plots provide graphical visualisation to offer insight into where relationships within the data exists")
+                    "**Pairs Plot** is a grid of scatterplots and histograms which show both distribution of single variables and relationships between variables. See sidebar to select Hue, the parameter for dictating colour encoding")
                 numeric_columns = list(
                     df.select_dtypes(['float', 'int']).columns)
                 vector = st.sidebar.selectbox(
@@ -144,18 +144,18 @@ def machinelearningdisplaygroup():
                 st.pyplot(fig)
 
         except ValueError:
-            st.write('Dataset is not appropriate for Pair Plot')
+            st.write('Dataset is not appropriate for Pairs Plot')
 
         try:
             # feature selection
-            feature_importance = st.checkbox("Feature Importance")
+            feature_importance = st.checkbox("Activate Feature Importance (XGBoost)")
             if feature_importance:
-                st.write('**Feature Importance**')
                 st.write(
-                    "Feature importance refers to techniques that assign a score to input features based on how useful they are at predicting a target variable")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
-                from matplotlib import pyplot
+                from matplotlib import pyplot as plt
 
                 # define the model
                 model = XGBClassifier()
@@ -168,37 +168,46 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
+                #st.write(importance)
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                #st.write((X.columns).tolist())
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
 
                 # summarize feature importance
                 for i,v in enumerate(importance):
                     print('Feature: %0d, Score: %.5f' % (i,v))
-                    st.write('Feature: %0d, Score: %.5f' % (i,v))
+                    #st.write('Feature: %0d, Score: %.5f' % (i,v))
                 
-                # plot feature importance
-                fig =([x for x in range(len(importance))], importance)
-                #st.bar_chart(fig)
-
         except ValueError:
             st.write('Dataset is not appropriate for Feature Selection')
 
        # -- MAKING DROP DOWN FEATURE SELECTION -- #
 
+        st.write('**Step 1.3:  Select Features to Train ML Model**')
+
         try:
             # allow user to chose what features to remain in dataframe for ML Models - Can drop those with poor correlation etc.
             #df = df.drop_duplicates()
             df_dropdrown = df.drop('Trans_Programming_Score', axis=1)
-            make_choice = st.multiselect('Select your dataset features for ML Models', df_dropdrown.columns)
+            make_choice = st.multiselect('Select from dropdown', df_dropdrown.columns)
             df_choice = df_dropdrown[make_choice]
             if make_choice:
-                st.write('**1.2. Planned ML Training Dataset Dataframe**')
+                st.write('Planned ML Training Dataset Dataframe : ')
                 st.write(df_choice)
             
         except ValueError:
             st.write('Error with Feature Selection for Dataframe')
 
         if make_choice:
-
-            task = st.selectbox("Select the Machine Learning Classifier to Train", [
+            
+            st.write('**Step 1.4:  Select the Machine Learning Classifier to Train**')
+            task = st.selectbox('Select from dropdown', [
                                 "< Please select a Classification Model >", "Decision Trees", "Support Vector Machines (SVM)", "Naive Bayes", "Random Forest", "Logistic Regression", "K-Nearest Neighbor"])
 
     # -- Support Vector Machines -- #
@@ -208,6 +217,7 @@ def machinelearningdisplaygroup():
                 class SVM_classifier():
                     import pandas as pd
 
+                import numpy as np
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -228,9 +238,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -296,43 +306,6 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-                # - Making a Predictive System - #
-
-                # Below 70 Programming score (Outcome 0)
-                # 70+ Programming score (Outcome 1)
-
-                with st.sidebar.subheader('New Input Parameters'):
-                    input_data=[]
-                    for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
-                        if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
-                            al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
-                        elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
-                            st.sidebar.slider('Sex: 0 = Male, 1 = Female', 0, 1, 0, 1)
-                        else:
-                            al_parameter=st.sidebar.slider(x)
-                        input_data.append(al_parameter)
-
-                # changing the input_data to numpy array
-                import numpy as np
-
-                input_data_as_numpy_array = np.asarray(input_data)
-
-                # reshape the array as we are predictin g for one instance
-                input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-                # standardize the input data
-                from sklearn.preprocessing import StandardScaler
-                scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
-                scaler.fit(df_choice.values)
-                std_data = scaler.transform(input_data_reshaped)
-                print(std_data)
-
-                # print prediciton based on input data
-                prediction = grid.predict(std_data)
-                print(prediction)
-
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
@@ -342,30 +315,30 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 #st.table(df_inputs)
 
-                st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
+                st.write("Upload the new results via CSV where the features included match those used to train the model in Step 1.3")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
                     df_newresults = pd.read_csv(uploaded_results, delimiter=',')
@@ -405,7 +378,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -414,7 +387,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -430,7 +403,7 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
 
         # -- RANDOM FOREST CLASSIFIER -- #
 
@@ -439,6 +412,7 @@ def machinelearningdisplaygroup():
 
                     import pandas as pd
 
+                import numpy as np
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -456,9 +430,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -521,45 +495,6 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-                # - Making a Predictive System - #
-
-                # Below 70 Programming score (Outcome 0)
-                # 70+ Programming score (Outcome 1)
-
-                with st.sidebar.subheader('New Input Parameters'):
-                    input_data=[]
-                    for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
-                        if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
-                            al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
-                        elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
-                            st.sidebar.slider('Sex: 0 = Male, 1 = Female', 0, 1, 0, 1)
-                        else:
-                            al_parameter=st.sidebar.slider(x)
-                        input_data.append(al_parameter)
-                
-                # changing the input_data to numpy array
-                import numpy as np
-
-                input_data_as_numpy_array = np.asarray(input_data)
-
-                # reshape the array as we are predictin g for one instance
-                input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-                # standardize the input data
-                from sklearn.preprocessing import StandardScaler
-                scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
-                scaler.fit(df_choice.values)
-                std_data = scaler.transform(input_data_reshaped)
-                print(std_data)
-
-                # print prediciton based on input data
-                prediction = grid.predict(std_data)
-                print(prediction)
-
-                # Print Model Performance
-
                 st.subheader('2. Model Performance')
 
                 #st.markdown('**2.1. Standardised Training Dataset**')
@@ -567,24 +502,24 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -604,8 +539,6 @@ def machinelearningdisplaygroup():
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
                         
-                    
-
                         input_data_group = []
                         for row in df_newresults.values:
                             input_data_as_numpy_array = np.asarray(row)
@@ -631,7 +564,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -640,7 +573,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -656,7 +589,7 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
 
         # -- LOGISTIC REGRESSION -- #
 
@@ -665,7 +598,7 @@ def machinelearningdisplaygroup():
 
                     import pandas as pd
                     
-
+                import numpy as np
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -683,9 +616,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -750,43 +683,6 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-                # - Making a Predictive System - #
-
-                # Below 70 Programming score (Outcome 0)
-                # 70+ Programming score (Outcome 1)
-
-                with st.sidebar.subheader('New Input Parameters'):
-                    input_data=[]
-                    for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
-                        if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
-                            al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
-                        elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
-                            st.sidebar.slider('Sex: 0 = Male, 1 = Female', 0, 1, 0, 1)
-                        else:
-                            al_parameter=st.sidebar.slider(x)
-                        input_data.append(al_parameter)
-          
-                # changing the input_data to numpy array
-                import numpy as np
-
-                input_data_as_numpy_array = np.asarray(input_data)
-
-                # reshape the array as we are predictin g for one instance
-                input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-                 # standardize the input data
-                from sklearn.preprocessing import StandardScaler
-                scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
-                scaler.fit(df_choice.values)
-                std_data = scaler.transform(input_data_reshaped)
-                print(std_data)
-
-                # print prediciton based on input data
-                prediction = grid.predict(std_data)
-                print(prediction)
-
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
@@ -796,24 +692,24 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -833,8 +729,6 @@ def machinelearningdisplaygroup():
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
                         
-                    
-
                         input_data_group = []
                         for row in df_newresults.values:
                             input_data_as_numpy_array = np.asarray(row)
@@ -860,7 +754,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -869,7 +763,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -885,7 +779,7 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
 
         # -- DECISION TREES -- #
 
@@ -894,7 +788,7 @@ def machinelearningdisplaygroup():
 
                     import pandas as pd
                     
-
+                import numpy as np
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -912,9 +806,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -988,44 +882,6 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-                # - Making a Predictive System - #
-
-                # Below 70 Programming score (Outcome 0)
-                # 70+ Programming score (Outcome 1)
-
-                with st.sidebar.subheader('New Input Parameters'):
-                    input_data=[]
-                    for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
-                        if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
-                            al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
-                        elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
-                            st.sidebar.slider('Sex: 0 = Male, 1 = Female', 0, 1, 0, 1)
-                        else:
-                            al_parameter=st.sidebar.slider(x)
-                        input_data.append(al_parameter)
-
-                # changing the input_data to numpy array
-                import numpy as np
-    
-                input_data_as_numpy_array = np.asarray(input_data)
-
-                # reshape the array as we are predicting for one instance
-                input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-                # standardize the input data
-                from sklearn.preprocessing import StandardScaler
-                scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
-                scaler.fit(df_choice.values)
-                std_data = scaler.transform(input_data_reshaped)
-                print(std_data)
-
-                # print prediciton based on input data
-                prediction = grid.predict(std_data)
-                print(prediction)
-
-                # Print Model Performance
 
                 st.subheader('2. Model Performance')
 
@@ -1034,24 +890,24 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -1071,8 +927,6 @@ def machinelearningdisplaygroup():
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
                         
-                    
-
                         input_data_group = []
                         for row in df_newresults.values:
                             input_data_as_numpy_array = np.asarray(row)
@@ -1098,7 +952,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -1107,7 +961,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -1123,7 +977,7 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
 
         # -- NAIVE BAYES -- #
 
@@ -1160,9 +1014,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
 
                 # Splitting the dataset into test/train
@@ -1272,25 +1126,25 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
                 st.write("Train/Test Split : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df = pd.DataFrame(report).transpose()
                 st.write(df.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -1332,7 +1186,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -1341,7 +1195,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -1357,7 +1211,7 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
                         
 
         # -- K-NEAREST NEIGHBOR -- #
@@ -1368,7 +1222,7 @@ def machinelearningdisplaygroup():
 
                     import pandas as pd
                     
-
+                import numpy as np
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -1389,9 +1243,9 @@ def machinelearningdisplaygroup():
                 start = time.time()
 
                 # Sidebar - Specify parameter settings
-                with st.sidebar.subheader('General Parameters'):
+                with st.sidebar.subheader('Test/Train Split Ratio'):
                     parameter_test_size = st.sidebar.slider(
-                        'Test Size (E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
+                        '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
@@ -1471,45 +1325,6 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-                # - Making a Predictive System - #
-
-                # Below 70 Programming score (Outcome 0)
-                # 70+ Programming score (Outcome 1)
-                
-                with st.sidebar.subheader('New Input Parameters'):
-                    input_data=[]
-                    for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
-                        if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
-                            al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
-                        elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
-                            st.sidebar.slider('Sex: 0 = Male, 1 = Female', 0, 1, 0, 1)
-                        else:
-                            al_parameter=st.sidebar.slider(x)
-                        input_data.append(al_parameter)
-
-                # changing the input_data to numpy array
-                import numpy as np
-
-                input_data_as_numpy_array = np.asarray(input_data)
-
-                # reshape the array as we are predictin g for one instance
-                input_data_reshaped = input_data_as_numpy_array.reshape(1, -1)
-
-                # standardize the input data
-                from sklearn.preprocessing import StandardScaler
-                scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
-                scaler.fit(df_choice.values) # fit the trained features from user dropdown
-
-                std_data = scaler.transform(input_data_reshaped)
-                print(std_data)
-
-                # print prediciton based on input data
-                prediction = grid.predict(std_data)
-                print(prediction)
-
-                # Print Model Performance
 
                 st.subheader('2. Model Performance')
 
@@ -1518,11 +1333,10 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**2.1. Hyper-Parameter Tuning**')
+                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
 
-                st.markdown('**2.1A. Feature Selection**')
                 # permutation feature importance with knn for classification
                 from sklearn.datasets import make_classification
                 from sklearn.inspection import permutation_importance
@@ -1546,20 +1360,20 @@ def machinelearningdisplaygroup():
                 #pyplot.show()
                 st.write(fig)
 
-                st.markdown('**2.2. Confusion Matrix Report**')
+                st.markdown('**Step 2.2: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**2.3. Classification Report**')
+                st.markdown('**Step 2.3: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**2.4. Training Time(s)**')
+                st.markdown('**Step 2.4: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**2.5. Upload Results for Group Prediction**")
+                st.write("**Step 2.5: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -1579,8 +1393,6 @@ def machinelearningdisplaygroup():
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
                         
-                    
-
                         input_data_group = []
                         for row in df_newresults.values:
                             input_data_as_numpy_array = np.asarray(row)
@@ -1606,7 +1418,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**2.6. Group Prediction Results**")
+                        st.write("**Step 2.6: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -1615,7 +1427,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.subheader('Download Prediction Results as CSV File')
+                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -1631,4 +1443,4 @@ def machinelearningdisplaygroup():
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
-                        st.write("2. Adjust features in Section 1.1 to Re-train the model to match the features in uploaded Results")
+                        st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
