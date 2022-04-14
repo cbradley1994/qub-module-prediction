@@ -26,7 +26,7 @@ def machinelearningdisplaygroup():
 
     st.sidebar.subheader('Upload your CSV data')
     uploaded_file = st.sidebar.file_uploader(
-        label="Ensure Dataset is cleaned prior to Upload. Visit Upload Dataset / Clean Dataset Page.", type=['csv'])
+        label="Ensure Dataset is cleaned prior to Upload. Visit Clean Dataset Page.", type=['csv'])
 
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file, na_values="NaN")
@@ -146,46 +146,6 @@ def machinelearningdisplaygroup():
         except ValueError:
             st.write('Dataset is not appropriate for Pairs Plot')
 
-        try:
-            # feature selection
-            feature_importance = st.checkbox("Activate Feature Importance (XGBoost)")
-            if feature_importance:
-                st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
-                
-                # xgboost for feature importance on a classification problem
-                from xgboost import XGBClassifier
-                from matplotlib import pyplot as plt
-
-                # define the model
-                model = XGBClassifier()
-
-                X = df.drop(columns='Trans_Programming_Score', axis=1)
-                y = df['Trans_Programming_Score']
-
-                # fit the model
-                model.fit(X, y)
-
-                # get importance
-                importance = model.feature_importances_
-                #st.write(importance)
-
-                # print Feature hearders for bar chart
-                st.write(X.columns)
-
-                #st.write((X.columns).tolist())
-                importancelist = importance.tolist()
-                fig = (importancelist)
-
-                st.bar_chart(fig)
-
-                # summarize feature importance
-                for i,v in enumerate(importance):
-                    print('Feature: %0d, Score: %.5f' % (i,v))
-                    #st.write('Feature: %0d, Score: %.5f' % (i,v))
-                
-        except ValueError:
-            st.write('Dataset is not appropriate for Feature Selection')
 
        # -- MAKING DROP DOWN FEATURE SELECTION -- #
 
@@ -315,24 +275,49 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -378,7 +363,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -387,7 +372,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -502,24 +487,49 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -564,7 +574,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -573,7 +583,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -692,24 +702,49 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -754,7 +789,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -763,7 +798,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -890,24 +925,49 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -952,7 +1012,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -961,7 +1021,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -1126,25 +1186,64 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
-                st.write("Train/Test Split : ", parameter_test_size, " / ", (1-parameter_test_size))
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cm = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cm)
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value')
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot(height=300)
+
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df = pd.DataFrame(report).transpose()
                 st.write(df.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -1186,7 +1285,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -1195,7 +1294,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
@@ -1333,9 +1432,34 @@ def machinelearningdisplaygroup():
                 #st.table(df_input_names)
                 #st.write(std_data)
 
-                st.markdown('**Step 2.1: Hyper-Parameter Tuning Results**')
+                st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
+                st.write(
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+
+                # xgboost for feature importance on a classification problem
+                from xgboost import XGBClassifier
+
+                # define the model
+                model = XGBClassifier()
+
+                # fit the model
+                model.fit(X_train, y_train)
+
+                # get importance
+                importance = model.feature_importances_
+
+                # print Feature hearders for bar chart
+                st.write(X.columns)
+
+                importancelist = importance.tolist()
+                fig = (importancelist)
+
+                st.bar_chart(fig)
+
+                st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
+                st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 # permutation feature importance with knn for classification
                 from sklearn.datasets import make_classification
@@ -1360,20 +1484,20 @@ def machinelearningdisplaygroup():
                 #pyplot.show()
                 st.write(fig)
 
-                st.markdown('**Step 2.2: Confusion Matrix Report**')
+                st.markdown('**Step 2.3: Confusion Matrix Report**')
                 st.write(confusion_matrix(y_test, grid_predictions))
 
-                st.markdown('**Step 2.3: Classification Report**')
+                st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
                 df_report = pd.DataFrame(report).transpose()
                 st.write(df_report.head())
 
                 #Measurement for model train time
-                st.markdown('**Step 2.4: Training Time(s)**')
+                st.markdown('**Step 2.5: Training Time(s)**')
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
-                st.write("**Step 2.5: Upload Results for Group Prediction**")
+                st.write("**Step 2.6: Upload Results for Group Prediction**")
                 #st.write("Update the sidebar with new parameters for prediction")
                 
                 #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
@@ -1418,7 +1542,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
-                        st.write("**Step 2.6: Group Prediction Results**")
+                        st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
                         if prediction_button:
@@ -1427,7 +1551,7 @@ def machinelearningdisplaygroup():
 
                             from methods import cleandataset_method as cl  # import cleandataset method
 
-                            st.write("**Step 2.7: Download Prediction Results as CSV File**")
+                            st.write("**Step 2.8: Download Prediction Results as CSV File**")
                             # Add cleaned dataset csv to filename. Adds _cleaned so can differentiate new file when dowloaded
                             file_name = uploaded_file.name[0:-4] + '_prediction_results.csv'
                             # Remove space to activate download link - replaced with an underscore to remove the space
