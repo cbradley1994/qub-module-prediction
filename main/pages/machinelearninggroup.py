@@ -277,7 +277,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -291,13 +291,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
@@ -506,7 +515,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -520,13 +529,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
@@ -738,7 +756,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -752,13 +770,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
@@ -978,7 +1005,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -992,13 +1019,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
@@ -1256,7 +1292,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -1270,13 +1306,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
@@ -1504,7 +1549,7 @@ def machinelearningdisplaygroup():
 
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
-                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediciton")
+                    "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
 
                 # xgboost for feature importance on a classification problem
                 from xgboost import XGBClassifier
@@ -1518,13 +1563,22 @@ def machinelearningdisplaygroup():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
+
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
