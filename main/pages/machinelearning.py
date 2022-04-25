@@ -339,7 +339,24 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
@@ -537,7 +554,24 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
@@ -737,7 +771,24 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
@@ -947,7 +998,24 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
@@ -1182,22 +1250,48 @@ def machinelearningdisplay():
                 # get importance
                 importance = model.feature_importances_
 
+                importancelist = importance.tolist()
                 # print Feature hearders for bar chart
                 st.write(X.columns)
-
-                importancelist = importance.tolist()
+                st.write(importance)
+                
                 fig = (importancelist)
 
-                st.bar_chart(fig)
+                try:
+                # seaborn visualisation using correlation plot to identify relationships
+                    feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
+                    if feature_selection_plot:
+                        
+                        st.bar_chart(fig)
 
+                except ValueError:
+                    st.write('Dataset is not appropriate for Feature Selection')
 
+                
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
@@ -1419,7 +1513,24 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
+
+                from sklearn.metrics import ConfusionMatrixDisplay
+
+                cconf_matrix = confusion_matrix(y_test, grid_predictions)
+                #dl = list(set(df_newresults[model_class]))
+                #dl = sorted(dl)
+
+                confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
+                plt.figure(figsize=(20, 20))
+                confusion_matrix.plot(cmap='Reds')
+                confusion_matrix.ax_.set(
+                    title='Confusion Matrix',
+                    xlabel='Predicted Value',
+                    ylabel='Actual Value',
+                    )
+                st.set_option('deprecation.showPyplotGlobalUse', False)
+                st.pyplot()
 
                 st.markdown('**Step 2.4: Classification Report**')
                 report = classification_report(y_test, grid_predictions, output_dict=True)
