@@ -1216,7 +1216,7 @@ def machinelearningdisplaygroup():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                st.write(confusion_matrix(y_test, grid_predictions))
+                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
