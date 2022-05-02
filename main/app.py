@@ -1,3 +1,12 @@
+'''
+
+Created by Callum Bradley
+
+File contains functions where application is launched from to intiiate variosu functions of the app
+
+'''
+#import libraries
+
 import sqlite3
 import streamlit as st
 import pandas as pd
@@ -10,12 +19,12 @@ from pages import profiles as prof # Page for displaying User Profiles
 
 # import image for landing page
 from PIL import Image
-img = Image.open("main/images/qub.jpg")
+img = Image.open("./images/qub.jpg")
+
 
 # Security
 # passlib,hashlib,bcrypt,scrypt
 import hashlib
-
 
 def make_hashes(password):
     return hashlib.sha256(str.encode(password)).hexdigest()
@@ -26,12 +35,10 @@ def check_hashes(password, hashed_text):
         return hashed_text
     return False
 
-
 # DB Management
 conn = sqlite3.connect('data.db')
 c = conn.cursor()
 # DB  Functions
-
 
 def create_usertable():
     c.execute('CREATE TABLE IF NOT EXISTS userstable(username TEXT,password TEXT)')
@@ -50,11 +57,13 @@ def login_user(username, password):
     return data
 
 
-
 def main():
-    """Simple Login App"""
+    """
+    
+    Initiates functionality of the webapp depending on user selection 
+    
+    """
 
-    #st.set_page_config(page_title="Module Score Predictor")
     st.title("Module Score Predictor App")
 
     menu = ["Home", "Login", "SignUp"]
@@ -63,16 +72,15 @@ def main():
     if choice == "Home":
         st.subheader(
             "Welcome to the QUB Machine Learning and Module Score Predictor Application. Login to get started!")
-            
-          
-            # display landing page image
+              
+        # display landing page image
         st.image(img, width = 600)
-        
 
+    # checks if user exists and offers logged in user functionality
+    # if not logged in, no access to webapp functions    
     elif choice == "Login":
         st.sidebar.subheader("Existing User")
         
-
         username = st.sidebar.text_input("User Name")
         password = st.sidebar.text_input("Password", type='password')
         if st.sidebar.checkbox("Login"):
@@ -86,20 +94,16 @@ def main():
                 st.sidebar.success("**Logged In as {}**".format(username))
 
                 task = st.selectbox(
-                    "Options", ["1. Upload Dataset / Clean Dataset", "2a. ML Dataset - Single Entry Prediction", "2b. ML Dataset - Group Entry Prediction", "Profiles"])
-                if task == "1. Upload Dataset / Clean Dataset":
+                    "Options", ["1. Clean Dataset", "2a. ML Dataset - Single Entry Prediction", "2b. ML Dataset - Group Entry Prediction", "Profiles"])
+                if task == "1. Clean Dataset":
                     cl.cleanerPageDisplay()
                 elif task == "2a. ML Dataset - Single Entry Prediction":
                     ml.machinelearningdisplay()
-                    #st.subheader("ML Dataset")
                 elif task == "2b. ML Dataset - Group Entry Prediction":
                     mlg.machinelearningdisplaygroup()
                 elif task == "Profiles":
                     prof.profilesdisplay()
-                    #st.subheader("User Profiles")
-                    #user_result = view_all_users()
-                    #clean_db = pd.DataFrame(user_result, columns=["Username", "Password"])
-                    #st.dataframe(clean_db)
+
         else:
             st.sidebar.warning("Incorrect Username/Password")
 
