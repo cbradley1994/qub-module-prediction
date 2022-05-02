@@ -19,7 +19,7 @@ from pages import profiles as prof # Page for displaying User Profiles
 
 # import image for landing page
 from PIL import Image
-img = Image.open("./images/qub.jpg")
+img = Image.open("/images/qub.jpg")
 
 
 # Security
