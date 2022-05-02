@@ -1,4 +1,11 @@
-from os import write
+'''
+
+Created by Callum Bradley
+
+File contains core functionality for webapp regards lightweight disk-based database for storing user Sign-Ups
+'''
+#import libraries
+
 import streamlit as st
 import pandas as pd
 import sqlite3
@@ -25,5 +32,3 @@ def profilesdisplay():
     user_result = view_all_users()
     clean_db = pd.DataFrame(user_result, columns=["Username", "Password"])
     st.dataframe(clean_db)
-
-
