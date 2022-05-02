@@ -1,12 +1,16 @@
-from matplotlib.pyplot import axis
+'''
+
+Created by Callum Bradley
+
+File contains core functionality for webapp regards back-end dataset cleaning
+
+'''
+#import libraries
+
+
 import pandas as pd
 import base64
-import datetime
-import sklearn
-
 from datetime import date
-from sklearn.preprocessing import LabelEncoder
-
 
 def get_csv_df(file):
 
