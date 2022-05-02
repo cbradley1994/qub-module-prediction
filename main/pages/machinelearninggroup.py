@@ -1,29 +1,34 @@
-from os import write
-from matplotlib import pyplot
-from scipy.sparse import data
-from seaborn.axisgrid import pairplot
-from sklearn import feature_selection
+'''
 
-from methods import machine_learn_method as ml
+Created by Callum Bradley
+
+File contains core functionality for webapp regards front-end and training of ML Models for Group Entry Prediction
+
+'''
+#import libraries
+
 import streamlit as st
+from seaborn.axisgrid import pairplot
 import pandas as pd
-import numpy
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
 import seaborn as sns  # Python visualisation library based upon matplotlib
-import plotly_express as px
-
-from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 
 def machinelearningdisplaygroup():
 
-    # dataframe as false before if conditions
-    df_file = False
+    '''
+    
+    Comments:
+    Creates frontend elements for all model training and prediciton for dropdown: '2b. ML Dataset - Group Entry Prediction'
+    
+    '''
 
+    df_file = False
     st.subheader("1. Model Training")
 
+    #set CSV uploader function via sidebar
     st.sidebar.subheader('Upload your CSV data')
     uploaded_file = st.sidebar.file_uploader(
         label="Ensure Dataset is cleaned prior to Upload. Visit Clean Dataset Page.", type=['csv'])
@@ -34,12 +39,10 @@ def machinelearningdisplaygroup():
 
     else:
         st.write("Upload Cleaned Dataset using the Sidebar")
-        #st.button("Use already cleaned dataset???")
 
     if df_file == True:
         st.write('**Step 1.1:  Uploaded Cleaned Dataset Dataframe**')
         st.write(df)
-        headers = list(df.columns)
 
         # https://github.com/thefullstackninja/Streamlit_tutorials/blob/master/data_visualization_app.py #
 
@@ -59,6 +62,7 @@ def machinelearningdisplaygroup():
 
                 #Correlation with output variable
                 cor_target = abs(df_corr["Trans_Programming_Score"])
+
                 #Selecting highly correlated features
                 relevant_features = cor_target[cor_target>0.1]
                 st.write('Correlation Ranking > 0.1 : ')
@@ -66,69 +70,6 @@ def machinelearningdisplaygroup():
 
         except ValueError:
             st.write('Dataset is not appropriate for Correlation Matrix')
-
-        #global numeric_columns
-        #global non_numeric_columns
-        #try:
-            # seaborn visualisation using graph plot
-            #graph = st.checkbox("Activate Data Plot")
-            #if graph:
-                #st.write('**Data Plot**')
-                #chart_select = st.sidebar.selectbox(
-                    #label="Select the chart type",
-                    #options=['Scatterplots', 'Histogram', 'Boxplot'])
-
-                #numeric_columns = list(
-                    #df.select_dtypes(['float', 'int']).columns)
-                #non_numeric_columns = list(
-                    #df.select_dtypes(['object']).columns)
-                #non_numeric_columns.append(None)
-                #print(non_numeric_columns)
-
-                #if chart_select == 'Scatterplots':
-                    #st.sidebar.subheader("Scatterplot Settings")
-                    #try:
-                        #x_values = st.sidebar.selectbox(
-                            #'X axis', options=numeric_columns)
-                        #y_values = st.sidebar.selectbox(
-                            #'Y axis', options=numeric_columns)
-                        #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        #plot = px.scatter(
-                            #data_frame=df, x=x_values, y=y_values)
-
-                        # display the chart
-                        #st.plotly_chart(plot)
-
-                    #except Exception as e:
-                        #print(e)
-
-                #elif chart_select == 'Histogram':
-                    #st.sidebar.subheader("Histogram Settings")
-                    #try:
-                        #x_values = st.sidebar.selectbox(
-                            #'X axis', options=numeric_columns)
-                        #y_values = st.sidebar.selectbox(
-                            #'Y axis', options=numeric_columns)
-                        #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        #plot = px.histogram(data_frame=df, x=x_values, y=y_values)
-                        #st.plotly_chart(plot)
-                    #except Exception as e:
-                        #print(e)
-
-                #elif chart_select == 'Boxplot':
-                    #st.sidebar.subheader("Boxplot Settings")
-                #try:
-                    #y = st.sidebar.selectbox("Y axis", options=numeric_columns)
-                    #x = st.sidebar.selectbox(
-                        #"X axis", options=non_numeric_columns)
-                    #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                    #plot = px.box(data_frame=df, y=y, x=x)
-                    #st.plotly_chart(plot)
-                #except Exception as e:
-                    #print(e)
-
-        #except ValueError:
-            #st.write('Dataset is not appropriate for Graph Plot')
 
         try:
             # seaborn visualisation using pair plots to identify relationships
@@ -153,7 +94,6 @@ def machinelearningdisplaygroup():
 
         try:
             # allow user to chose what features to remain in dataframe for ML Models - Can drop those with poor correlation etc.
-            #df = df.drop_duplicates()
             df_dropdrown = df.drop('Trans_Programming_Score', axis=1)
             make_choice = st.multiselect('Select from dropdown', df_dropdrown.columns)
             df_choice = df_dropdrown[make_choice]
@@ -164,15 +104,18 @@ def machinelearningdisplaygroup():
         except ValueError:
             st.write('Error with Feature Selection for Dataframe')
 
+        # -- MAKING DROP DOWN MODEL SELECTION -- # 
+
         if make_choice:
             
             st.write('**Step 1.4:  Select the Machine Learning Classifier to Train**')
             task = st.selectbox('Select from dropdown', [
                                 "< Please select a Classification Model >", "Decision Trees", "Support Vector Machines (SVM)", "Naive Bayes", "Random Forest", "Logistic Regression", "K-Nearest Neighbor"])
 
+# -- Build each ML Model -- #
+    
     # -- Support Vector Machines -- #
 
- 
             if task == "Support Vector Machines (SVM)":
                 class SVM_classifier():
                     import pandas as pd
@@ -185,11 +128,7 @@ def machinelearningdisplaygroup():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # returns first 5 rows as dataframe
-                df.head()
-
                 # creating the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -205,9 +144,8 @@ def machinelearningdisplaygroup():
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
-                # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -227,11 +165,12 @@ def machinelearningdisplaygroup():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
                 # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -239,19 +178,14 @@ def machinelearningdisplaygroup():
                 param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [
                     1, 0.1, 0.01, 0.001], 'kernel': ['rbf', 'poly', 'sigmoid', 'linear']}
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
-                grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, cv=10)
+                # does 5 fold cross-validation and takes average
+                grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, cv=5)
                 grid.fit(X_train, y_train)
 
                 #Stop timer to measure train timer for model
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -269,12 +203,6 @@ def machinelearningdisplaygroup():
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -290,12 +218,11 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -313,15 +240,12 @@ def machinelearningdisplaygroup():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -343,12 +267,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in Step 1.3")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -357,13 +277,9 @@ def machinelearningdisplaygroup():
 
                     # -- If Condition to make sure group results features match the trained models features
 
-                    #st.write("choice list", list(df_choice.columns))
-                    #st.write("newresults", list(df_newresults.columns))
-
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
                         
-
                         input_data_group = []
                         for row in df_newresults.values:
                             input_data_as_numpy_array = np.asarray(row)
@@ -372,7 +288,6 @@ def machinelearningdisplaygroup():
 
                             from sklearn.preprocessing import StandardScaler
                             scaler = StandardScaler()
-                            #scaler.fit(df.drop('Trans_Programming_Score',axis=1).values) #.values is to ensure headers not included
                             scaler.fit(df_newresults.values)
 
                             std_data = scaler.transform(input_data_reshaped)
@@ -388,7 +303,8 @@ def machinelearningdisplaygroup():
                                 input_data_group.append("PASS")
 
                         df_newresults['Prediction']=input_data_group
-                        
+
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -409,7 +325,6 @@ def machinelearningdisplaygroup():
                         else:
                             ("Upload New Results for Group Prediction")
                     
-
                     else:
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
@@ -420,7 +335,6 @@ def machinelearningdisplaygroup():
 
             elif task == "Random Forest":
                 class RandomForest_classifier():
-
                     import pandas as pd
 
                 import numpy as np
@@ -432,7 +346,6 @@ def machinelearningdisplaygroup():
                 from sklearn.metrics import classification_report, confusion_matrix
 
                 # creating the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -449,7 +362,7 @@ def machinelearningdisplaygroup():
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -468,22 +381,19 @@ def machinelearningdisplaygroup():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
 
                 param_grid={'n_estimators':[10,50,100,150,200],'min_samples_leaf':[1,5,10,15,50],'max_features':('auto','sqrt','log2')} 
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average 
                 grid = GridSearchCV(RandomForestClassifier(),param_grid, cv=5, refit=True,verbose=2)
                 grid.fit(X_train, y_train)
 
@@ -491,7 +401,6 @@ def machinelearningdisplaygroup():
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -506,13 +415,9 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
+                # Print Model Performance
+
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -528,12 +433,11 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -546,20 +450,18 @@ def machinelearningdisplaygroup():
                 except ValueError:
                     st.write('Dataset is not appropriate for Feature Selection')
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.2: Hyper-Parameter Tuning Results**')
                 st.write('Model after tuning of Hyper-Parameters : ',
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -581,12 +483,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -594,9 +492,6 @@ def machinelearningdisplaygroup():
                     st.dataframe(df_newresults)
 
                     # -- If Condition to make sure group results features match the trained models features
-
-                    #st.write("choice list", list(df_choice.columns))
-                    #st.write("newresults", list(df_newresults.columns))
 
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
@@ -609,7 +504,6 @@ def machinelearningdisplaygroup():
 
                             from sklearn.preprocessing import StandardScaler
                             scaler = StandardScaler()
-                            #scaler.fit(df.drop('Trans_Programming_Score',axis=1).values) #.values is to ensure headers not included
                             scaler.fit(df_newresults.values)
 
                             std_data = scaler.transform(input_data_reshaped)
@@ -626,6 +520,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -657,7 +552,6 @@ def machinelearningdisplaygroup():
 
             elif task == "Logistic Regression":
                 class LogisticRegression_classifier():
-
                     import pandas as pd
                     
                 import numpy as np
@@ -668,8 +562,7 @@ def machinelearningdisplaygroup():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -687,7 +580,7 @@ def machinelearningdisplaygroup():
                     X, y, test_size=parameter_test_size, random_state=999)
          
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -706,11 +599,12 @@ def machinelearningdisplaygroup():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -718,11 +612,7 @@ def machinelearningdisplaygroup():
 
                 param_grid={"C":np.logspace(-3,3,7), "penalty":["l2"]} # l1 lasso l2 ridge 
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average
                 grid = GridSearchCV(LogisticRegression(),param_grid, cv=5, refit=True,verbose=2)
                 grid.fit(X_train, y_train)
 
@@ -748,12 +638,6 @@ def machinelearningdisplaygroup():
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -769,12 +653,11 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -792,15 +675,12 @@ def machinelearningdisplaygroup():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -822,12 +702,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -835,9 +711,6 @@ def machinelearningdisplaygroup():
                     st.dataframe(df_newresults)
 
                     # -- If Condition to make sure group results features match the trained models features
-
-                    #st.write("choice list", list(df_choice.columns))
-                    #st.write("newresults", list(df_newresults.columns))
 
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
@@ -850,7 +723,6 @@ def machinelearningdisplaygroup():
 
                             from sklearn.preprocessing import StandardScaler
                             scaler = StandardScaler()
-                            #scaler.fit(df.drop('Trans_Programming_Score',axis=1).values) #.values is to ensure headers not included
                             scaler.fit(df_newresults.values)
 
                             std_data = scaler.transform(input_data_reshaped)
@@ -867,6 +739,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -886,7 +759,6 @@ def machinelearningdisplaygroup():
 
                         else:
                             ("Upload New Results for Group Prediction")
-                    
 
                     else:
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
@@ -898,7 +770,6 @@ def machinelearningdisplaygroup():
 
             elif task == "Decision Trees":
                 class DecisionTree_classifier():
-
                     import pandas as pd
                     
                 import numpy as np
@@ -909,8 +780,7 @@ def machinelearningdisplaygroup():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -928,7 +798,7 @@ def machinelearningdisplaygroup():
                     X, y, test_size=parameter_test_size, random_state=999)
                 # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -947,15 +817,15 @@ def machinelearningdisplaygroup():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
-                #import numpy as np
 
                 dt = DecisionTreeClassifier(random_state=999)
 
@@ -965,14 +835,10 @@ def machinelearningdisplaygroup():
                         'criterion': ["gini", "entropy"]
                         }
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
                 # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
                 grid = GridSearchCV(estimator=dt, 
                             param_grid=params, 
-                            cv=4, n_jobs=-1, verbose=1, scoring = "accuracy")
+                            cv=5, n_jobs=-1, verbose=1, scoring = "accuracy")
                 #%%time
                 grid.fit(X_train, y_train)
 
@@ -980,7 +846,6 @@ def machinelearningdisplaygroup():
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -997,12 +862,6 @@ def machinelearningdisplaygroup():
 
 
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1018,12 +877,11 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -1041,15 +899,13 @@ def machinelearningdisplaygroup():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart        
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
                 #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1071,12 +927,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -1084,9 +936,6 @@ def machinelearningdisplaygroup():
                     st.dataframe(df_newresults)
 
                     # -- If Condition to make sure group results features match the trained models features
-
-                    #st.write("choice list", list(df_choice.columns))
-                    #st.write("newresults", list(df_newresults.columns))
 
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
@@ -1116,6 +965,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -1146,20 +996,15 @@ def machinelearningdisplaygroup():
         # -- NAIVE BAYES -- #
 
             elif task == "Naive Bayes":
-
                 class NaiveBayes_classifier():
-
                     import pandas as pd
             
                 import numpy as np
-
                 from sklearn.naive_bayes import BernoulliNB
                 from sklearn.naive_bayes import GaussianNB
                 from sklearn.naive_bayes import MultinomialNB
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
-
-                from sklearn import metrics
                 from sklearn.metrics import accuracy_score
                 from sklearn.metrics import classification_report, confusion_matrix
                 from matplotlib import pyplot as plt 
@@ -1167,11 +1012,9 @@ def machinelearningdisplaygroup():
                 # returns first 5 rows as dataframe
                 df.head()
 
-                # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
-
 
                 #Start timer to record train time of model
                 import time
@@ -1182,13 +1025,11 @@ def machinelearningdisplaygroup():
                     parameter_test_size = st.sidebar.slider(
                         '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
-
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
-                # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -1238,7 +1079,7 @@ def machinelearningdisplaygroup():
 
 
                 # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
 
@@ -1256,7 +1097,7 @@ def machinelearningdisplaygroup():
                 # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
                 # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
 
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average
                 grid = GridSearchCV(GaussianNB(),param_grid = param_grid,cv=cv_method,verbose=1,scoring='accuracy')
                 
                 Data_transformed = PowerTransformer().fit_transform(X_test)
@@ -1266,7 +1107,6 @@ def machinelearningdisplaygroup():
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -1284,12 +1124,6 @@ def machinelearningdisplaygroup():
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1329,14 +1163,9 @@ def machinelearningdisplaygroup():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
-
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1358,12 +1187,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -1400,6 +1225,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -1420,7 +1246,6 @@ def machinelearningdisplaygroup():
                         else:
                             ("Upload New Results for Group Prediction")
                     
-
                     else:
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
@@ -1431,9 +1256,7 @@ def machinelearningdisplaygroup():
         # -- K-NEAREST NEIGHBOR -- #
 
             elif task == "K-Nearest Neighbor":
-                
                 class KNearestNeighbor():
-
                     import pandas as pd
                     
                 import numpy as np
@@ -1444,11 +1267,7 @@ def machinelearningdisplaygroup():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # returns first 5 rows as dataframe
-                df.head()
-
-                # createing the target variabel - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variabel - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -1464,9 +1283,8 @@ def machinelearningdisplaygroup():
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=101)
-                # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -1485,11 +1303,12 @@ def machinelearningdisplaygroup():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
                 
                 from sklearn.model_selection import GridSearchCV
@@ -1500,12 +1319,8 @@ def machinelearningdisplaygroup():
                         'metric' : ['minkowski','euclidean','manhattan']
                             }
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
                 # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
-                grid = GridSearchCV(KNeighborsClassifier(), grid_params, verbose = 1, cv=10, n_jobs = -1)
+                grid = GridSearchCV(KNeighborsClassifier(), grid_params, verbose = 1, cv=5, n_jobs = -1)
                 
                 # fit the model on our train set
                 g_res = grid.fit(X_train, y_train)
@@ -1524,7 +1339,6 @@ def machinelearningdisplaygroup():
                 knn.fit(X_train, y_train)
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -1539,14 +1353,7 @@ def machinelearningdisplaygroup():
                 print('Classification Report ',
                     classification_report(y_test, grid_predictions))
 
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1562,12 +1369,11 @@ def machinelearningdisplaygroup():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -1585,38 +1391,12 @@ def machinelearningdisplaygroup():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
-                # permutation feature importance with knn for classification
-                from sklearn.datasets import make_classification
-                from sklearn.inspection import permutation_importance
-                from matplotlib import pyplot
-
-                # fit the model
-                knn.fit(X_train, y_train)
-
-                # perform permutation importance
-                results = permutation_importance(knn, X_train, y_train, scoring='accuracy')
-
-                # get importance
-                importance = results.importances_mean
-
-                # summarize feature importance
-                for i,v in enumerate(importance):
-                    print('Feature: %0d, Score: %.5f' % (i,v))
-                
-                # plot feature importance
-                fig = pyplot.bar([x for x in range(len(importance))], importance)
-                #pyplot.show()
-                st.write(fig)
-
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1638,12 +1418,8 @@ def machinelearningdisplaygroup():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: Upload Results for Group Prediction**")
-                #st.write("Update the sidebar with new parameters for prediction")
-                
-                #df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
-                #st.table(df_inputs)
-
                 st.write("Upload the new results via CSV where the features included match those used to train the model in section 1.1")
                 uploaded_results = st.file_uploader(label = "Upload your CSV File containing Group Results (200MB max)", type=['csv'])
                 if uploaded_results is not None:
@@ -1651,9 +1427,6 @@ def machinelearningdisplaygroup():
                     st.dataframe(df_newresults)
 
                     # -- If Condition to make sure group results features match the trained models features
-
-                    #st.write("choice list", list(df_choice.columns))
-                    #st.write("newresults", list(df_newresults.columns))
 
                     #use set instead of list as set can account for unordered list. Using list wont consider user selecting features in same order as that uploaded
                     if set(df_choice.columns) == set(df_newresults.columns):
@@ -1683,6 +1456,7 @@ def machinelearningdisplaygroup():
 
                         df_newresults['Prediction']=input_data_group
                         
+                        # Upload function for new set of results to predict from
                         st.write("**Step 2.7: Group Prediction Results**")
                         st.write("Upon upload of results for group prediction, click Predict")
                         prediction_button = st.button("Predict")
@@ -1702,10 +1476,12 @@ def machinelearningdisplaygroup():
 
                         else:
                             ("Upload New Results for Group Prediction")
-                    
 
                     else:
                         st.write("**ERROR - Features (Column Names) from uploaded Results do not match features from trained model in Section 1.1 - Planned ML Training Dataset Dataframe. Cannot Continue**")
                         st.write("Please do one of the following:")
                         st.write("1. Re-upload Results where features match that of the trained model")
                         st.write("2. Adjust features in Step 1.3 to Re-train the model to match the features in uploaded Results")
+        
+        else:
+            ("Please select a classifier from the dropdown")
