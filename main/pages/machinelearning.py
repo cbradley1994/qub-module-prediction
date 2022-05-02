@@ -1,27 +1,34 @@
-from os import write
-from matplotlib import pyplot
-from scipy.sparse import data
-from seaborn.axisgrid import pairplot
+'''
 
-from methods import machine_learn_method as ml
+Created by Callum Bradley
+
+File contains core functionality for webapp regards front-end and training of ML Models for Single Entry Prediction
+
+'''
+#import libraries
+
 import streamlit as st
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, r2_score
-import seaborn as sns  # Python visualisation library based upon matplotlib
-import plotly_express as px
-
-from sklearn.preprocessing import StandardScaler
+import seaborn as sns 
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from seaborn.axisgrid import pairplot
 
 
 def machinelearningdisplay():
 
-    # dataframe as false before if conditions
-    df_file = False
+    '''
+    
+    Comments:
+    Creates frontend elements for all model training and prediciton for dropdown: '2a. ML Dataset - Single Entry Prediction'
+    
+    '''
 
+    df_file = False
     st.subheader("1. Model Training")
 
+    #set CSV uploader function via sidebar
     st.sidebar.subheader('Upload your CSV data')
     uploaded_file = st.sidebar.file_uploader(
         label="Ensure Dataset is cleaned prior to Upload. Visit Clean Dataset Page.", type=['csv'])
@@ -32,13 +39,12 @@ def machinelearningdisplay():
 
     else:
         st.write("Upload Cleaned Dataset using the Sidebar")
-        #st.button("Use already cleaned dataset???")
 
     if df_file == True:
         st.write('**Step 1.1:  Uploaded Cleaned Dataset Dataframe**')
         st.write(df)
-        headers = list(df.columns)
 
+        # perform feature selection methods
         # https://github.com/thefullstackninja/Streamlit_tutorials/blob/master/data_visualization_app.py #
 
         st.write('**Step 1.2:  Feature Selection**')
@@ -49,7 +55,6 @@ def machinelearningdisplay():
             if heatmap:
                 st.write(
                     "**Correlation Matrix** is a table displaying the correlation coefficients between variables. Each cell demonstrates the correlation between two variables")
-
                 df_corr = df.corr()
                 sns.heatmap(df_corr, annot=True, cmap='YlGnBu')
                 st.set_option('deprecation.showPyplotGlobalUse', False)
@@ -57,6 +62,7 @@ def machinelearningdisplay():
 
                 #Correlation with output variable
                 cor_target = abs(df_corr["Trans_Programming_Score"])
+
                 #Selecting highly correlated features
                 relevant_features = cor_target[cor_target>0.1]
                 st.write('Correlation Ranking > 0.1')
@@ -64,69 +70,6 @@ def machinelearningdisplay():
 
         except ValueError:
             st.write('Dataset is not appropriate for Correlation Matrix')
-
-        #global numeric_columns
-        #global non_numeric_columns
-        #try:
-            # seaborn visualisation using graph plot
-            #graph = st.checkbox("Activate Data Plot")
-            #if graph:
-                #st.write('**Data Plot**')
-                #chart_select = st.sidebar.selectbox(
-                    #label="Select the chart type",
-                    #options=['Scatterplots', 'Histogram', 'Boxplot'])
-
-                #numeric_columns = list(
-                    #df.select_dtypes(['float', 'int']).columns)
-                #non_numeric_columns = list(
-                    #df.select_dtypes(['object']).columns)
-                #non_numeric_columns.append(None)
-                #print(non_numeric_columns)
-
-                #if chart_select == 'Scatterplots':
-                    #st.sidebar.subheader("Scatterplot Settings")
-                    #try:
-                        #x_values = st.sidebar.selectbox(
-                            #'X axis', options=numeric_columns)
-                        #y_values = st.sidebar.selectbox(
-                            #'Y axis', options=numeric_columns)
-                        #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        #plot = px.scatter(
-                            #data_frame=df, x=x_values, y=y_values)
-
-                        # display the chart
-                        #st.plotly_chart(plot)
-
-                    #except Exception as e:
-                        #print(e)
-
-                #elif chart_select == 'Histogram':
-                    #st.sidebar.subheader("Histogram Settings")
-                    #try:
-                        #x_values = st.sidebar.selectbox(
-                            #'X axis', options=numeric_columns)
-                        #y_values = st.sidebar.selectbox(
-                            #'Y axis', options=numeric_columns)
-                        #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                        #plot = px.histogram(data_frame=df, x=x_values, y=y_values)
-                        #st.plotly_chart(plot)
-                    #except Exception as e:
-                        #print(e)
-
-                #elif chart_select == 'Boxplot':
-                    #st.sidebar.subheader("Boxplot Settings")
-                #try:
-                    #y = st.sidebar.selectbox("Y axis", options=numeric_columns)
-                    #x = st.sidebar.selectbox(
-                        #"X axis", options=non_numeric_columns)
-                    #color_value = st.sidebar.selectbox("Color", options=non_numeric_columns)
-                    #plot = px.box(data_frame=df, y=y, x=x)
-                    #st.plotly_chart(plot)
-                #except Exception as e:
-                    #print(e)
-
-        #except ValueError:
-            #st.write('Dataset is not appropriate for Graph Plot')
 
         try:
             # seaborn visualisation using pair plots to identify relationships
@@ -144,14 +87,12 @@ def machinelearningdisplay():
         except ValueError:
             st.write('Dataset is not appropriate for Pairs Plot')
         
-
        # -- MAKING DROP DOWN FEATURE SELECTION -- #
 
         st.write('**Step 1.3:  Select Features to Train ML Model**')
 
         try:
-            # allow user to chose what features to remain in dataframe for ML Models - Can drop those with poor correlation etc.
-            #df = df.drop_duplicates()
+            # allow user to chose what features to remain in dataframe for ML Models - Can drop those with poor correlation etc
             df_dropdrown = df.drop('Trans_Programming_Score', axis=1)
             make_choice = st.multiselect('Select from dropdown', df_dropdrown.columns)
             df_choice = df_dropdrown[make_choice]
@@ -162,15 +103,18 @@ def machinelearningdisplay():
         except ValueError:
             st.write('Error with Feature Selection for Dataframe')
 
+       # -- MAKING DROP DOWN MODEL SELECTION -- # 
+       
         if make_choice:
 
             st.write('**Step 1.4:  Select the Machine Learning Classifier to Train**')
             task = st.selectbox("Select the Machine Learning Classifier to Train", [
                                 "< Please select a Classification Model >", "Decision Trees", "Support Vector Machines (SVM)", "Naive Bayes", "Random Forest", "Logistic Regression", "K-Nearest Neighbor"])
 
+# -- Build each ML Model -- #
+
     # -- Support Vector Machines -- #
 
- 
             if task == "Support Vector Machines (SVM)":
                 class SVM_classifier():
                     import pandas as pd
@@ -179,14 +123,9 @@ def machinelearningdisplay():
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
                 from sklearn.svm import SVC
-                from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # returns first 5 rows as dataframe
-                df.head()
-
                 # creating the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -202,14 +141,12 @@ def machinelearningdisplay():
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
-                # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
 
-                #transform X_trainvalues between 0 and 1 to remove negative values
                 from sklearn import preprocessing
                 min_max_scaler = preprocessing.MinMaxScaler()
 
@@ -224,11 +161,12 @@ def machinelearningdisplay():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
                 # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -236,19 +174,14 @@ def machinelearningdisplay():
                 param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [
                     1, 0.1, 0.01, 0.001], 'kernel': ['rbf', 'poly', 'sigmoid', 'linear']}
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
-                grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, cv=10)
+                # does 5 fold cross-validation and takes average
+                grid = GridSearchCV(SVC(), param_grid, refit=True, verbose=2, cv=5)
                 grid.fit(X_train, y_train)
 
                 #Stop timer to measure train timer for model
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -264,14 +197,11 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
                         if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
                             al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
                         elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
@@ -291,7 +221,6 @@ def machinelearningdisplay():
                 # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values)
                 std_data = scaler.transform(input_data_reshaped)
                 print(std_data)
@@ -301,14 +230,7 @@ def machinelearningdisplay():
                 print(prediction)
 
                 # Print Model Performance
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -324,12 +246,11 @@ def machinelearningdisplay():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -347,15 +268,12 @@ def machinelearningdisplay():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -377,12 +295,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
                 
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -413,7 +334,6 @@ def machinelearningdisplay():
                 from sklearn.metrics import classification_report, confusion_matrix
 
                 # creating the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -449,11 +369,12 @@ def machinelearningdisplay():
                 # Length of Test data
                 len(X_test)
 
+                 # Optimise hyper-parameters when training Model
+
                 # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -488,14 +409,12 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
+                        
                         if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
                             al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
                         elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
@@ -515,7 +434,6 @@ def machinelearningdisplay():
                 # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values)
                 std_data = scaler.transform(input_data_reshaped)
                 print(std_data)
@@ -525,14 +443,7 @@ def machinelearningdisplay():
                 print(prediction)
 
                 # Print Model Performance
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -548,12 +459,11 @@ def machinelearningdisplay():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+                
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -571,15 +481,12 @@ def machinelearningdisplay():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
-
+                
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -601,11 +508,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predicitve parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
+                
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -627,8 +538,7 @@ def machinelearningdisplay():
                 class LogisticRegression_classifier():
 
                     import pandas as pd
-                    
-
+            
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -636,8 +546,7 @@ def machinelearningdisplay():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -654,7 +563,6 @@ def machinelearningdisplay():
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
          
-
                 # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
@@ -674,11 +582,12 @@ def machinelearningdisplay():
                 # Length of Test data
                 len(X_test)
 
+                # Optimise hyper-parameters when training Model
+
                 # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -686,11 +595,7 @@ def machinelearningdisplay():
 
                 param_grid={"C":np.logspace(-3,3,7), "penalty":["l2"]} # l1 lasso l2 ridge 
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average
                 grid = GridSearchCV(LogisticRegression(),param_grid, cv=5, refit=True,verbose=2)
                 grid.fit(X_train, y_train)
 
@@ -698,7 +603,6 @@ def machinelearningdisplay():
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -714,10 +618,8 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
@@ -741,7 +643,6 @@ def machinelearningdisplay():
                  # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values)
                 std_data = scaler.transform(input_data_reshaped)
                 print(std_data)
@@ -751,14 +652,7 @@ def machinelearningdisplay():
                 print(prediction)
 
                 # Print Model Performance
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -797,15 +691,11 @@ def machinelearningdisplay():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
-
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -827,12 +717,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predicitve parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
                 
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -852,10 +745,8 @@ def machinelearningdisplay():
 
             elif task == "Decision Trees":
                 class DecisionTree_classifier():
-
                     import pandas as pd
                     
-
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -864,7 +755,6 @@ def machinelearningdisplay():
                 from sklearn.metrics import classification_report, confusion_matrix
 
                 # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -882,7 +772,7 @@ def machinelearningdisplay():
                     X, y, test_size=parameter_test_size, random_state=999)
                 # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -901,16 +791,16 @@ def machinelearningdisplay():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
-                #import numpy as np
-
+    
                 dt = DecisionTreeClassifier(random_state=999)
 
                 params={
@@ -919,14 +809,10 @@ def machinelearningdisplay():
                         'criterion': ["gini", "entropy"]
                         }
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average
                 grid = GridSearchCV(estimator=dt, 
                             param_grid=params, 
-                            cv=4, n_jobs=-1, verbose=1, scoring = "accuracy")
+                            cv=5, n_jobs=-1, verbose=1, scoring = "accuracy")
                 #%%time
                 grid.fit(X_train, y_train)
 
@@ -934,7 +820,6 @@ def machinelearningdisplay():
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -950,14 +835,11 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
                         if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
                             al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
                         elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
@@ -977,7 +859,6 @@ def machinelearningdisplay():
                 # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values)
                 std_data = scaler.transform(input_data_reshaped)
                 print(std_data)
@@ -987,14 +868,7 @@ def machinelearningdisplay():
                 print(prediction)
 
                 # Print Model Performance
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1033,15 +907,12 @@ def machinelearningdisplay():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1063,12 +934,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predicitve parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
                 
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -1087,20 +961,15 @@ def machinelearningdisplay():
         # -- NAIVE BAYES -- #
 
             elif task == "Naive Bayes":
-
-                class NaiveBayes_classifier():
-
+                class NaiveBayes_classifier(): 
                     import pandas as pd
             
                 import numpy as np
-
                 from sklearn.naive_bayes import BernoulliNB
                 from sklearn.naive_bayes import GaussianNB
                 from sklearn.naive_bayes import MultinomialNB
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
-
-                from sklearn import metrics
                 from sklearn.metrics import accuracy_score
                 from sklearn.metrics import classification_report, confusion_matrix
                 from matplotlib import pyplot as plt 
@@ -1108,11 +977,9 @@ def machinelearningdisplay():
                 # returns first 5 rows as dataframe
                 df.head()
 
-                # createing the target variable - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
-
 
                 #Start timer to record train time of model
                 import time
@@ -1123,13 +990,12 @@ def machinelearningdisplay():
                     parameter_test_size = st.sidebar.slider(
                         '(E.g. 20/80 split = 20% Test / 80% Train)', 0.1, 0.9, 0.2, 0.1)
 
-
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=999)
                 # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
@@ -1174,15 +1040,12 @@ def machinelearningdisplay():
                 GausNB.fit(X_train, y_train)
                 print(GausNB)
 
-                #y_expect = GausNB.predict(X_test)
-                #print(accuracy_score(y_expect, y_pred))
+                # Optimise hyper-parameters when training Model
 
-
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
 
                 from sklearn.model_selection import GridSearchCV
@@ -1193,21 +1056,16 @@ def machinelearningdisplay():
                 from sklearn.preprocessing import PowerTransformer
                 param_grid = {'var_smoothing': np.logspace(0,-9, num=100)}
 
-                # What fit does is a bit more involved than usual. First, it runs the same loop with cross-validation, to find the best parameter combination.
-                # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
-                # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
-
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
+                # does 5 fold cross-validation and takes average
                 grid = GridSearchCV(GaussianNB(),param_grid = param_grid,cv=cv_method,verbose=1,scoring='accuracy')
                 
                 Data_transformed = PowerTransformer().fit_transform(X_test)
-                grid.fit(Data_transformed, y_test);
+                grid.fit(Data_transformed, y_test) 
 
                 #Stop timer to measure train timer for model
                 stop = time.time()
 
                 # Find the optimal parameters
-                # print best parameter after tuning
                 print(grid.best_params_)
 
                 # print how our model looks after hyper-parameter tuning
@@ -1223,16 +1081,12 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-
                 # Predict New Input Dataset using trained Model:
-               
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
                         if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
                             al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
                         elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
@@ -1252,24 +1106,16 @@ def machinelearningdisplay():
                 # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values)
                 std_data = scaler.transform(input_data_reshaped)
-                print("Std Data : ", std_data)
+                print(std_data)
 
                 # print prediction based on input data
                 prediction = grid.predict(std_data)
-                print("Prediction : ", prediction)
+                print(prediction)
 
                 # Print Model Performance
-
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1285,21 +1131,18 @@ def machinelearningdisplay():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
                 # seaborn visualisation using correlation plot to identify relationships
                     feature_selection_plot = st.checkbox("Activate Feature Selection Plot")
                     if feature_selection_plot:
-                        
                         st.bar_chart(fig)
-
                 except ValueError:
                     st.write('Dataset is not appropriate for Feature Selection')
 
@@ -1309,15 +1152,11 @@ def machinelearningdisplay():
                         grid.best_estimator_)
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
+                #print Confusion Marix Chart
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
-
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1339,12 +1178,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predicitve parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
                 
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -1359,17 +1201,14 @@ def machinelearningdisplay():
 
                 else:
                     ("Enter Results in Sidebar and Click Predict")
-        
+
 
         # -- K-NEAREST NEIGHBOR -- #
 
             elif task == "K-Nearest Neighbor":
-                
                 class KNearestNeighbor():
-
                     import pandas as pd
                     
-
                 from matplotlib import pyplot as plt
                 from sklearn.model_selection import train_test_split
                 from sklearn.preprocessing import StandardScaler
@@ -1377,11 +1216,7 @@ def machinelearningdisplay():
                 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
                 from sklearn.metrics import classification_report, confusion_matrix
 
-                # returns first 5 rows as dataframe
-                df.head()
-
-                # createing the target variabel - programming score
-                #X = df.drop(columns='Trans_Programming_Score', axis=1)
+                # creating the target variable - programming score
                 X = df_choice #Make X feature for training model match the features selected by user in dropdown
                 y = df['Trans_Programming_Score']
 
@@ -1397,17 +1232,16 @@ def machinelearningdisplay():
                 # Splitting the dataset into test/train
                 X_train, X_test, y_train, y_test = train_test_split(
                     X, y, test_size=parameter_test_size, random_state=101)
-                # random state needs optimised via trial and error. 101 seems good
 
-                # Scale/normalize the dataset - Between 0 and 1. This normalizes the data where there can possibly be outliers that carry weight
+                # Standardise the dataset - Between 0 and 1. Reduce where there can possibly be outliers that carry weight
                 sc = StandardScaler()
                 X_train = sc.fit_transform(X_train)
                 X_test = sc.fit_transform(X_test)
 
-                # scale the data set between 0 and 1 to remove negative values
                 from sklearn import preprocessing
                 min_max_scaler = preprocessing.MinMaxScaler()
 
+                #transform X_trainvalues between 0 and 1 to remove negative values
                 X_train = min_max_scaler.fit_transform(X_train)
 
                 print(X_train)
@@ -1418,11 +1252,12 @@ def machinelearningdisplay():
                 # Length of Test data
                 len(X_test)
 
-                # Train The Model - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
-                # Call the SVC() (SVC=SVM Model) model from sklearn and fit the model to the training data
+                # Optimise hyper-parameters when training Model
+
+                # GridSearch - https://www.vebuso.com/2020/03/svm-hyperparameter-tuning-using-gridsearchcv/
+                # Call the model from sklearn and fit the model to the training data
                 # Determine which kernel performs the best based on the performance metrics such as precision, recall and f1 score.
                 # Fine Tuning the hyper-parameters using grid search. By not setting a value for cv GridSearchCV uses 5 fold cross validation - https://www.geeksforgeeks.org/svm-hyperparameter-tuning-using-gridsearchcv-ml/
-
                 # Create a dictionary called param_grid and fill out some parameters for kernels, C and gamma
                 
                 from sklearn.model_selection import GridSearchCV
@@ -1437,8 +1272,8 @@ def machinelearningdisplay():
                 # Once it has the best combination, it runs fit again on all data passed to fit (without cross-validation), to build a single new model using the best parameter setting.
                 # You can inspect the best parameters found by GridSearchCV in the best_params_ attribute, and the best estimator in the best_estimator_ attribute:
 
-                # does 5 fold cross-validation and takes average. Can be changed to 10 if needs be. Doesnt make any diff here
-                grid = GridSearchCV(KNeighborsClassifier(), grid_params, verbose = 1, cv=10, n_jobs = -1)
+                # does 5 fold cross-validation and takes average
+                grid = GridSearchCV(KNeighborsClassifier(), grid_params, verbose = 1, cv=5, n_jobs = -1)
                 
                 # fit the model on our train set
                 g_res = grid.fit(X_train, y_train)
@@ -1473,14 +1308,11 @@ def machinelearningdisplay():
                     classification_report(y_test, grid_predictions))
 
                 # - Making a Predictive System - #
-
                 # Below 70 Programming score (Outcome 0)
                 # 70+ Programming score (Outcome 1)
-                
                 with st.sidebar.subheader('New Input Parameters'):
                     input_data=[]
                     for x in make_choice:
-                        #sidebar_params = st.sidebar.slider(x)
                         if x == 'Trans_Acadmode': # Required for those features with with either a 0 or 1 for scaling
                             al_parameter = st.sidebar.slider('Acad Mode: 0 = Full-Time, 1 = Part-Time', 0, 1, 0, 1)
                         elif x == 'Trans_Sex': # Required for those features with with either a 0 or 1 for scaling
@@ -1500,7 +1332,6 @@ def machinelearningdisplay():
                 # standardize the input data
                 from sklearn.preprocessing import StandardScaler
                 scaler = StandardScaler()
-                #scaler.fit(df.drop('Trans_Programming_Score', axis=1).values)
                 scaler.fit(df_choice.values) # fit the trained features from user dropdown
 
                 std_data = scaler.transform(input_data_reshaped)
@@ -1513,12 +1344,6 @@ def machinelearningdisplay():
                 # Print Model Performance
 
                 st.subheader('2. Model Performance')
-
-                #st.markdown('**2.1. Standardised Training Dataset**')
-                #df_input_names = pd.DataFrame(std_data, columns = make_choice)
-                #st.table(df_input_names)
-                #st.write(std_data)
-
                 st.markdown('**Step 2.1: Feature Importance (XGBoost)**')
                 st.write(
                     "**Feature importance** refers to a class of techniques for assigning a score to an input feature to a predictive model, that indicates the relative importance when making a prediction")
@@ -1534,12 +1359,11 @@ def machinelearningdisplay():
 
                 # get importance
                 importance = model.feature_importances_
-
                 importancelist = importance.tolist()
+
                 # print Feature hearders for bar chart
                 st.write(X.columns)
                 st.write(importance)
-                
                 fig = (importancelist)
 
                 try:
@@ -1558,14 +1382,10 @@ def machinelearningdisplay():
                 st.write("Test/Train Split (sidebar) : ", parameter_test_size, " / ", (1-parameter_test_size))
 
                 st.markdown('**Step 2.3: Confusion Matrix Report**')
-                #st.write(confusion_matrix(y_test, grid_predictions))
 
                 from sklearn.metrics import ConfusionMatrixDisplay
 
                 cconf_matrix = confusion_matrix(y_test, grid_predictions)
-                #dl = list(set(df_newresults[model_class]))
-                #dl = sorted(dl)
-
                 confusion_matrix = ConfusionMatrixDisplay(cconf_matrix)
                 plt.figure(figsize=(20, 20))
                 confusion_matrix.plot(cmap='Reds')
@@ -1587,12 +1407,15 @@ def machinelearningdisplay():
                 TrainingTime = stop-start
                 st.write("%.2f" % TrainingTime)
 
+                #Input of new predictive parameters
                 st.write("**Step 2.6: New Input Parameters for Prediction**")
                 st.write("Update the sidebar with new parameters for prediction")
                 
+                #returns new dataframe depending on what features trained the model
                 df_inputs = pd.DataFrame(input_data_reshaped, columns = make_choice) 
                 st.table(df_inputs)
 
+                #returns prediction result as At Risk/Pass
                 st.write("**Step 2.7: Single Entry Prediction Result**")
                 st.write("Upon update of sidebar with new input parameters, click Predict")
                 prediction_button = st.button("Predict")
@@ -1607,3 +1430,6 @@ def machinelearningdisplay():
 
                 else:
                     ("Enter Results in Sidebar and Click Predict")
+
+        else:
+            ("Please select a classifier from the dropdown")
