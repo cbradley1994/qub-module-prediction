@@ -1,10 +1,25 @@
-from os import write
+'''
+
+Created by Callum Bradley
+
+File contains core functionality for webapp regards front-end when uploading and cleaning of dataset
+
+'''
+#import libraries
+
 import streamlit as st
 import pandas as pd
 from methods import cleandataset_method as cl  # import cleandataset method
 
 
 def cleanerPageDisplay():
+
+    '''
+    
+    Comments:
+    Creates frontend elements for cleaning of dataset via 1. Upload Dataset / CLean Dataset dropdown
+    
+    '''
 
     st.subheader("Dataset Cleaner")
     
@@ -22,13 +37,6 @@ def cleanerPageDisplay():
         st.write("**Missing Data** - Any Data from the uploaded dataset that has a missing entry in a row")
         st.write(nulldata)
 
-        #if nulldata:
-            #st.write(nulldata)
-        #else:
-            #st.write("No missing Data")
-
-
-        #with st.sidebar: # (Option to have clean dataset options in sidebar)
         with st.form('dataset_cleanerform'):
                 st.subheader('Dataset Cleaning:')
                 st.write('*a) Please select an option from each dropdown as to how missing data from each column is to be processed (If Applicable)*')
@@ -79,7 +87,3 @@ def cleanerPageDisplay():
     # If no dataset is yet to be uploaded
     else:
         st.write("Upload your Dataset using the Sidebar")
-
-
-
-
