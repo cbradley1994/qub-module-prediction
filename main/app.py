@@ -64,14 +64,14 @@ def main():
     
     """
 
-    st.title("Module Score Predictor App")
+    st.title("QUB Prediction Application")
 
     menu = ["Home", "Login", "SignUp"]
     choice = st.sidebar.selectbox("Menu", menu)
 
     if choice == "Home":
         st.subheader(
-            "Welcome to the QUB Machine Learning and Module Score Predictor Application. Login to get started!")
+            "Welcome to the QUB Prediction Application. Login to get started!")
               
         # display landing page image
         st.image(img, width = 600)
